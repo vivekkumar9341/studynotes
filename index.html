@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Topper Notes Hub — Learn Smarter. Score Higher.</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Font Awesome for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+<body>
+
+  <!-- ============================
+       NAVIGATION BAR
+  =============================== -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-container">
+      <!-- Logo -->
+      <a href="#" class="logo">
+        <i class="fas fa-book-open"></i>
+        <span>Topper Notes Hub</span>
+      </a>
+
+      <!-- Desktop Menu Links -->
+      <nav class="nav-menu" id="navMenu">
+        <ul class="nav-links">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#notes" class="nav-link">Courses</a></li>
+          <li><a href="#notes" class="nav-link">Notes</a></li>
+          <li><a href="#videos" class="nav-link">Videos</a></li>
+          <li><a href="#resources" class="nav-link">Resources</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Auth Buttons (visible when logged out) -->
+      <div class="nav-auth" id="navAuth">
+        <button class="btn btn-outline btn-sm" id="openLoginBtn">Login</button>
+        <button class="btn btn-primary btn-sm" id="openSignupBtn">Sign Up</button>
+      </div>
+
+      <!-- User Profile Dropdown (visible when logged in) -->
+      <div class="user-menu hidden" id="userMenu">
+        <button class="user-menu-toggle" id="userMenuToggle">
+          <div class="user-avatar"><i class="fas fa-user"></i></div>
+          <span class="user-name" id="userName">Student</span>
+          <i class="fas fa-chevron-down user-chevron"></i>
+        </button>
+        <div class="user-dropdown" id="userDropdown">
+        <div class="dropdown-header">
+            <span class="dropdown-email" id="userEmail">user@example.com</span>
+            <span class="role-badge" id="roleBadge">Student</span>
+          </div>
+          <ul>
+            <li><a href="#"><i class="fas fa-user-circle"></i> My Profile</a></li>
+            <li><a href="#"><i class="fas fa-shopping-bag"></i> My Purchases</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+            <li id="adminLink" class="hidden"><a href="admin.html"><i class="fas fa-shield-alt"></i> Admin Panel</a></li>
+            <li class="dropdown-divider"></li>
+            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Hamburger Menu Button (mobile) -->
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================
+       AUTH MODAL (Login / Sign Up)
+  =============================== -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-modal">
+      <!-- Close Button -->
+      <button class="auth-close" id="authClose" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Login</button>
+        <button class="auth-tab" data-tab="signup">Sign Up</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form class="auth-form" id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" />
+          <span class="error-msg" id="loginEmailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="loginPassword" placeholder="Enter password" />
+            <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <span class="error-msg" id="loginPasswordError"></span>
+        </div>
+
+        <div class="auth-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe" /> Remember me
+          </label>
+          <a href="#" class="forgot-link">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+        <p class="auth-message" id="loginMessage"></p>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <button type="button" class="btn btn-social btn-google">
+          <i class="fab fa-google"></i> Continue with Google
+        </button>
+
+        <p class="auth-switch">
+          Don't have an account? <a href="#" data-switch="signup">Sign Up</a>
+        </p>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form class="auth-form hidden" id="signupForm" novalidate>
+        <div class="form-group">
+          <label for="signupName">Full Name</label>
+          <input type="text" id="signupName" placeholder="Your full name" />
+          <span class="error-msg" id="signupNameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" />
+          <span class="error-msg" id="signupEmailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="signupPassword" placeholder="Min 6 characters" />
+            <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <span class="error-msg" id="signupPasswordError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="signupConfirm">Confirm Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="signupConfirm" placeholder="Re-enter password" />
+            <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <span class="error-msg" id="signupConfirmError"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        <p class="auth-message" id="signupMessage"></p>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <button type="button" class="btn btn-social btn-google">
+          <i class="fab fa-google"></i> Continue with Google
+        </button>
+
+        <p class="auth-switch">
+          Already have an account? <a href="#" data-switch="login">Login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================
+       HERO SECTION
+  =============================== -->
+  <section class="hero" id="home">
+    <div class="container hero-content">
+      <div class="hero-text">
+        <h1>Learn Smarter.<br />Score Higher.</h1>
+        <p>
+          Premium study notes, exam preparation guides, and concept videos for
+          students.
+        </p>
+        <div class="hero-buttons">
+          <a href="#notes" class="btn btn-primary">Explore Notes</a>
+          <a href="#videos" class="btn btn-outline">Watch Videos</a>
+        </div>
+      </div>
+      <div class="hero-illustration">
+        <!-- Illustration placeholder -->
+        <div class="illustration-placeholder">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       POPULAR NOTES SECTION
+  =============================== -->
+  <section class="section notes-section" id="notes">
+    <div class="container">
+      <h2 class="section-title">Popular Notes</h2>
+      <p class="section-subtitle">
+        Top-rated study materials trusted by thousands of students.
+      </p>
+
+      <!-- Search / Filter Bar -->
+      <div class="notes-search-bar">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          id="notesSearch"
+          placeholder="Search notes by subject..."
+        />
+      </div>
+
+      <!-- Notes Card Grid (populated dynamically by JS) -->
+      <div class="card-grid" id="notesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============================
+       VIDEO LEARNING SECTION
+  =============================== -->
+  <section class="section videos-section" id="videos">
+    <div class="container">
+      <h2 class="section-title">Video Learning</h2>
+      <p class="section-subtitle">
+        Watch concept videos and learn at your own pace.
+      </p>
+
+      <!-- Video Grid (populated dynamically by JS) -->
+      <div class="video-grid" id="videoGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============================
+       STUDY RESOURCES SECTION
+  =============================== -->
+  <section class="section resources-section" id="resources">
+    <div class="container">
+      <h2 class="section-title">Free Study Resources</h2>
+      <p class="section-subtitle">
+        Grab these free resources to boost your preparation.
+      </p>
+
+      <div class="resource-grid">
+        <!-- Resource 1 -->
+        <div class="resource-card">
+          <div class="resource-icon"><i class="fas fa-clipboard-list"></i></div>
+          <h3>Exam Preparation Guide</h3>
+          <p>Step-by-step plan to prepare for your board exams effectively.</p>
+          <a href="#" class="btn btn-outline btn-sm">Download Free</a>
+        </div>
+
+        <!-- Resource 2 -->
+        <div class="resource-card">
+          <div class="resource-icon"><i class="fas fa-trophy"></i></div>
+          <h3>Topper Study Strategy</h3>
+          <p>Learn how toppers plan their schedule and revision cycles.</p>
+          <a href="#" class="btn btn-outline btn-sm">Download Free</a>
+        </div>
+
+        <!-- Resource 3 -->
+        <div class="resource-card">
+          <div class="resource-icon"><i class="fas fa-clock"></i></div>
+          <h3>Last Day Revision Plan</h3>
+          <p>A quick revision checklist to use the night before your exam.</p>
+          <a href="#" class="btn btn-outline btn-sm">Download Free</a>
+        </div>
+
+        <!-- Resource 4 -->
+        <div class="resource-card">
+          <div class="resource-icon"><i class="fas fa-square-root-alt"></i></div>
+          <h3>Formula Sheets</h3>
+          <p>All important formulas for Maths, Physics and Chemistry in one place.</p>
+          <a href="#" class="btn btn-outline btn-sm">Download Free</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       TESTIMONIALS SECTION
+  =============================== -->
+  <section class="section testimonials-section" id="testimonials">
+    <div class="container">
+      <h2 class="section-title">What Students Say</h2>
+      <p class="section-subtitle">
+        Join thousands of happy students across the country.
+      </p>
+
+      <div class="testimonial-grid">
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card">
+          <div class="testimonial-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <p class="testimonial-text">
+            "Helped me score 92% in board exams. The notes are well-structured
+            and easy to understand."
+          </p>
+          <h4 class="testimonial-name">Priya Sharma</h4>
+          <span class="testimonial-info">Class 10, CBSE</span>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card">
+          <div class="testimonial-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <p class="testimonial-text">
+            "The video explanations made tough concepts like Electricity and
+            Trigonometry super simple!"
+          </p>
+          <h4 class="testimonial-name">Rohit Verma</h4>
+          <span class="testimonial-info">Class 10, ICSE</span>
+        </div>
+
+        <!-- Testimonial 3 -->
+        <div class="testimonial-card">
+          <div class="testimonial-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <p class="testimonial-text">
+            "Best study resource I've found online. The previous year papers
+            were a game-changer."
+          </p>
+          <h4 class="testimonial-name">Ananya Gupta</h4>
+          <span class="testimonial-info">Class 12, CBSE</span>
+        </div>
+
+        <!-- Testimonial 4 -->
+        <div class="testimonial-card">
+          <div class="testimonial-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <p class="testimonial-text">
+            "The formula sheets and last-day revision plans saved me during
+            exam season. Highly recommend!"
+          </p>
+          <h4 class="testimonial-name">Karan Singh</h4>
+          <span class="testimonial-info">Class 12, State Board</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       CALL-TO-ACTION SECTION
+  =============================== -->
+  <section class="cta-section" id="cta">
+    <div class="container cta-content">
+      <h2>Start your exam preparation today with premium notes.</h2>
+      <p>
+        Thousands of students trust Topper Notes Hub for their exam success.
+        Join them now.
+      </p>
+      <a href="#notes" class="btn btn-primary btn-lg">Get Premium Notes</a>
+    </div>
+  </section>
+
+  <!-- ============================
+       CONTACT SECTION
+  =============================== -->
+  <section class="section contact-section" id="contact">
+    <div class="container">
+      <h2 class="section-title">Contact Us</h2>
+      <p class="section-subtitle">
+        Have a question? We'd love to hear from you.
+      </p>
+
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Your name" />
+          <span class="error-msg" id="nameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="you@example.com"
+          />
+          <span class="error-msg" id="emailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            placeholder="Write your message..."
+          ></textarea>
+          <span class="error-msg" id="messageError"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Send Message</button>
+        <p class="form-success" id="formSuccess"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============================
+       FOOTER
+  =============================== -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <!-- Brand -->
+      <div class="footer-col">
+        <a href="#" class="logo footer-logo">
+          <i class="fas fa-book-open"></i>
+          <span>Topper Notes Hub</span>
+        </a>
+        <p>Empowering students with quality study materials and resources.</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#notes">Notes</a></li>
+          <li><a href="#videos">Videos</a></li>
+          <li><a href="#resources">Resources</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li>
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:hello@toppernoteshub.com">hello@toppernoteshub.com</a>
+          </li>
+          <li>
+            <i class="fas fa-phone"></i>
+            <span>+91 98765 43210</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Social Media -->
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 Topper Notes Hub. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>

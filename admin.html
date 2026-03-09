@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Topper Notes Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    /* ==========================================
+       ADMIN PANEL STYLES
+       ========================================== */
+
+    :root {
+      --primary:       #1a56db;
+      --primary-dark:  #1340a8;
+      --primary-light: #e8effc;
+      --accent:        #0ea5e9;
+      --white:         #ffffff;
+      --gray-50:       #f8fafc;
+      --gray-100:      #f1f5f9;
+      --gray-200:      #e2e8f0;
+      --gray-400:      #94a3b8;
+      --gray-600:      #475569;
+      --gray-800:      #1e293b;
+      --gray-900:      #0f172a;
+      --success:       #16a34a;
+      --danger:        #dc2626;
+      --warning:       #f59e0b;
+      --radius:        12px;
+      --radius-sm:     8px;
+      --shadow:        0 4px 20px rgba(0,0,0,0.08);
+      --transition:    0.3s ease;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { font-size:16px; }
+    body { font-family:"Inter",sans-serif; color:var(--gray-800); background:var(--gray-100); line-height:1.6; }
+    a { text-decoration:none; color:inherit; }
+    ul { list-style:none; }
+    .hidden { display:none !important; }
+
+    /* --- Access Screens --- */
+    .access-screen {
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:40px 20px;
+      background:var(--gray-50);
+    }
+    .access-screen i.lock-icon { font-size:4rem; color:var(--danger); margin-bottom:20px; }
+    .access-screen i.login-icon { font-size:4rem; color:var(--primary); margin-bottom:20px; }
+    .access-screen h1 { font-size:1.8rem; margin-bottom:10px; }
+    .access-screen p { color:var(--gray-600); margin-bottom:24px; max-width:400px; }
+    .access-screen .btn { display:inline-block; padding:12px 28px; border-radius:var(--radius-sm); font-weight:600; font-size:0.95rem; border:none; cursor:pointer; transition:var(--transition); }
+    .access-screen .btn-primary { background:var(--primary); color:var(--white); }
+    .access-screen .btn-primary:hover { background:var(--primary-dark); }
+
+    /* --- Inline Login Form on Access Screen --- */
+    .admin-login-box {
+      background:var(--white); border-radius:var(--radius); padding:32px 28px;
+      box-shadow:var(--shadow); width:100%; max-width:400px; text-align:left; margin-top:8px;
+    }
+    .admin-login-box h2 { font-size:1.1rem; font-weight:700; margin-bottom:20px; text-align:center; color:var(--gray-800); }
+    .admin-login-box .form-group { margin-bottom:16px; }
+    .admin-login-box .form-group label { display:block; font-weight:600; font-size:0.85rem; margin-bottom:4px; color:var(--gray-800); }
+    .admin-login-box .form-group input {
+      width:100%; padding:10px 14px;
+      border:2px solid var(--gray-200); border-radius:var(--radius-sm);
+      font-family:inherit; font-size:0.9rem; color:var(--gray-800);
+      transition:var(--transition); background:var(--white);
+    }
+    .admin-login-box .form-group input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(26,86,219,0.12); }
+    .admin-login-box .form-group input.invalid { border-color:var(--danger); }
+    .admin-login-box .form-group .error-msg { display:block; color:var(--danger); font-size:0.78rem; margin-top:3px; min-height:16px; }
+    .admin-login-box .password-wrap { position:relative; }
+    .admin-login-box .password-wrap input { padding-right:44px; }
+    .admin-login-box .pw-toggle {
+      position:absolute; top:50%; right:12px; transform:translateY(-50%);
+      background:none; border:none; color:var(--gray-400); cursor:pointer; font-size:0.95rem; transition:var(--transition);
+    }
+    .admin-login-box .pw-toggle:hover { color:var(--primary); }
+    .admin-login-box .login-msg { text-align:center; font-size:0.85rem; margin-top:10px; min-height:20px; font-weight:600; }
+    .admin-login-box .login-msg.success { color:var(--success); }
+    .admin-login-box .login-msg.error { color:var(--danger); }
+    .admin-login-box .login-footer { text-align:center; margin-top:16px; font-size:0.85rem; color:var(--gray-400); }
+    .admin-login-box .login-footer a { color:var(--primary); font-weight:600; }
+
+    /* --- Admin Layout --- */
+    .admin-layout { display:flex; min-height:100vh; }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      width:260px;
+      background:var(--gray-900);
+      color:var(--gray-200);
+      position:fixed;
+      top:0; left:0; bottom:0;
+      display:flex;
+      flex-direction:column;
+      z-index:100;
+      transition:var(--transition);
+    }
+    .sidebar-header { padding:24px 20px 20px; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .sidebar-logo { display:flex; align-items:center; gap:10px; font-size:1.1rem; font-weight:800; color:var(--white); }
+    .sidebar-logo i { color:var(--accent); font-size:1.2rem; }
+    .sidebar-badge { font-size:0.65rem; background:var(--primary); color:var(--white); padding:2px 8px; border-radius:10px; margin-left:4px; font-weight:600; }
+
+    .sidebar-nav { flex:1; padding:16px 0; }
+    .sidebar-nav a {
+      display:flex; align-items:center; gap:12px;
+      padding:12px 20px;
+      font-size:0.9rem; font-weight:500;
+      color:var(--gray-400);
+      transition:var(--transition);
+      border-left:3px solid transparent;
+    }
+    .sidebar-nav a:hover { color:var(--white); background:rgba(255,255,255,0.04); }
+    .sidebar-nav a.active { color:var(--white); background:rgba(255,255,255,0.06); border-left-color:var(--primary); }
+    .sidebar-nav a i { width:20px; text-align:center; font-size:0.95rem; }
+
+    .sidebar-footer { padding:16px 20px; border-top:1px solid rgba(255,255,255,0.08); }
+    .sidebar-footer a { display:flex; align-items:center; gap:10px; font-size:0.88rem; color:var(--gray-400); transition:var(--transition); }
+    .sidebar-footer a:hover { color:var(--white); }
+
+    /* --- Main Content --- */
+    .admin-main { flex:1; margin-left:260px; }
+
+    .admin-header {
+      position:sticky; top:0; z-index:50;
+      background:var(--white);
+      padding:16px 32px;
+      display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 1px 8px rgba(0,0,0,0.04);
+    }
+    .admin-header h1 { font-size:1.3rem; font-weight:700; }
+    .admin-header-right { display:flex; align-items:center; gap:16px; }
+    .admin-user { display:flex; align-items:center; gap:8px; font-size:0.88rem; font-weight:600; color:var(--gray-600); }
+    .admin-user i { color:var(--primary); }
+    .btn-logout { background:none; border:1px solid var(--gray-200); border-radius:var(--radius-sm); padding:6px 14px; font-size:0.82rem; font-weight:600; cursor:pointer; color:var(--gray-600); transition:var(--transition); }
+    .btn-logout:hover { border-color:var(--danger); color:var(--danger); }
+
+    .admin-content { padding:28px 32px; }
+
+    /* --- Panel (tab content) --- */
+    .panel { display:none; }
+    .panel.active { display:block; }
+
+    /* --- Stats Grid --- */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; margin-bottom:32px; }
+    .stat-card {
+      background:var(--white); border-radius:var(--radius); padding:24px;
+      box-shadow:var(--shadow); display:flex; align-items:center; gap:18px;
+    }
+    .stat-icon {
+      width:52px; height:52px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.2rem;
+    }
+    .stat-icon.blue { background:var(--primary-light); color:var(--primary); }
+    .stat-icon.green { background:#dcfce7; color:var(--success); }
+    .stat-icon.orange { background:#fef3c7; color:var(--warning); }
+    .stat-icon.red { background:#fee2e2; color:var(--danger); }
+    .stat-info h3 { font-size:1.6rem; font-weight:800; line-height:1; }
+    .stat-info p { font-size:0.82rem; color:var(--gray-400); margin-top:4px; }
+
+    /* --- Cards / Section Blocks --- */
+    .admin-card {
+      background:var(--white); border-radius:var(--radius);
+      padding:28px; box-shadow:var(--shadow); margin-bottom:24px;
+    }
+    .admin-card h2 { font-size:1.15rem; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+    .admin-card h2 i { color:var(--primary); }
+
+    /* --- Forms --- */
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-weight:600; font-size:0.85rem; margin-bottom:4px; color:var(--gray-800); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width:100%; padding:10px 14px;
+      border:2px solid var(--gray-200); border-radius:var(--radius-sm);
+      font-family:inherit; font-size:0.9rem; color:var(--gray-800);
+      transition:var(--transition); background:var(--white);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(26,86,219,0.12); }
+    .form-group input.invalid { border-color:var(--danger); }
+    .form-group .error-msg { display:block; color:var(--danger); font-size:0.78rem; margin-top:3px; min-height:16px; }
+    .form-group .file-label {
+      display:flex; align-items:center; gap:8px;
+      padding:10px 14px; border:2px dashed var(--gray-200); border-radius:var(--radius-sm);
+      cursor:pointer; font-size:0.88rem; color:var(--gray-400); transition:var(--transition);
+    }
+    .form-group .file-label:hover { border-color:var(--primary); color:var(--primary); }
+    .form-group .file-label i { font-size:1rem; }
+    .form-group .file-name { font-size:0.82rem; color:var(--gray-600); margin-top:4px; }
+    .form-group input[type="file"] { display:none; }
+
+    .form-actions { display:flex; gap:10px; margin-top:8px; }
+
+    /* --- Buttons --- */
+    .btn { display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:0.88rem; padding:10px 20px; border-radius:var(--radius-sm); border:2px solid transparent; cursor:pointer; transition:var(--transition); }
+    .btn-primary { background:var(--primary); color:var(--white); border-color:var(--primary); }
+    .btn-primary:hover { background:var(--primary-dark); border-color:var(--primary-dark); }
+    .btn-success { background:var(--success); color:var(--white); border-color:var(--success); }
+    .btn-success:hover { background:#15803d; }
+    .btn-edit { background:var(--warning); color:var(--white); border-color:var(--warning); }
+    .btn-edit:hover { background:#d97706; }
+    .btn-delete { background:var(--danger); color:var(--white); border-color:var(--danger); }
+    .btn-delete:hover { background:#b91c1c; }
+    .btn-cancel { background:var(--gray-200); color:var(--gray-600); border-color:var(--gray-200); }
+    .btn-cancel:hover { background:var(--gray-400); color:var(--white); }
+    .btn-sm { padding:6px 14px; font-size:0.8rem; }
+
+    /* --- Tables --- */
+    .table-wrapper { overflow-x:auto; }
+    .admin-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .admin-table th { text-align:left; padding:12px 14px; background:var(--gray-50); color:var(--gray-600); font-weight:600; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; border-bottom:2px solid var(--gray-200); }
+    .admin-table td { padding:12px 14px; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
+    .admin-table tr:hover td { background:var(--gray-50); }
+    .table-actions { display:flex; gap:6px; }
+
+    /* --- Empty State --- */
+    .empty-state { text-align:center; padding:40px 20px; color:var(--gray-400); }
+    .empty-state i { font-size:2.5rem; margin-bottom:12px; display:block; }
+    .empty-state p { font-size:0.9rem; }
+
+    /* --- Toast / inline message --- */
+    .form-msg { font-size:0.85rem; margin-top:10px; font-weight:600; }
+    .form-msg.success { color:var(--success); }
+    .form-msg.error { color:var(--danger); }
+
+    /* --- Mobile hamburger for sidebar --- */
+    .sidebar-toggle {
+      display:none; position:fixed; top:16px; left:16px; z-index:200;
+      width:42px; height:42px; border-radius:var(--radius-sm);
+      background:var(--gray-900); color:var(--white); border:none;
+      font-size:1.1rem; cursor:pointer;
+    }
+
+    /* --- Responsive --- */
+    @media(max-width:768px) {
+      .sidebar { transform:translateX(-100%); }
+      .sidebar.open { transform:translateX(0); }
+      .sidebar-toggle { display:flex; align-items:center; justify-content:center; }
+      .admin-main { margin-left:0; }
+      .admin-header { padding:16px 16px 16px 70px; }
+      .admin-content { padding:20px 16px; }
+      .form-row { grid-template-columns:1fr; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+    }
+    @media(max-width:480px) {
+      .stats-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NOT LOGGED IN SCREEN (with inline login form) ===== -->
+  <div class="access-screen hidden" id="screenNotLoggedIn">
+    <i class="fas fa-sign-in-alt login-icon"></i>
+    <h1>Admin Login</h1>
+    <p>Sign in to access the admin panel or the main website.</p>
+
+    <div class="admin-login-box">
+      <h2><i class="fas fa-user-shield" style="color:var(--primary);margin-right:6px;"></i> Sign In</h2>
+      <form id="adminLoginForm" novalidate>
+        <div class="form-group">
+          <label for="adminLoginEmail">Email</label>
+          <input type="email" id="adminLoginEmail" placeholder="you@example.com" />
+          <span class="error-msg" id="adminLoginEmailError"></span>
+        </div>
+        <div class="form-group">
+          <label for="adminLoginPassword">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="adminLoginPassword" placeholder="Enter password" />
+            <button type="button" class="pw-toggle" id="adminPwToggle" aria-label="Toggle password"><i class="fas fa-eye"></i></button>
+          </div>
+          <span class="error-msg" id="adminLoginPasswordError"></span>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <p class="login-msg" id="adminLoginMsg"></p>
+      </form>
+      <p class="login-footer"><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Website</a></p>
+    </div>
+  </div>
+
+  <!-- ===== ACCESS DENIED SCREEN ===== -->
+  <div class="access-screen hidden" id="screenDenied">
+    <i class="fas fa-lock lock-icon"></i>
+    <h1>Access Denied</h1>
+    <p>This page is restricted to administrators only. Your account does not have admin privileges.</p>
+    <a href="index.html" class="btn btn-primary">Back to Website</a>
+  </div>
+
+  <!-- ===== SIDEBAR TOGGLE (mobile) ===== -->
+  <button class="sidebar-toggle hidden" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+  <!-- ===== ADMIN DASHBOARD ===== -->
+  <div class="admin-layout hidden" id="adminDashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-book-open"></i>
+          <span>TNH</span>
+          <span class="sidebar-badge">Admin</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" data-panel="panelDashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="#" data-panel="panelNotes"><i class="fas fa-file-alt"></i> Manage Notes</a>
+        <a href="#" data-panel="panelVideos"><i class="fas fa-video"></i> Manage Videos</a>
+        <a href="#" data-panel="panelQuestions"><i class="fas fa-question-circle"></i> Student Questions</a>
+        <a href="#" data-panel="panelUsers"><i class="fas fa-users"></i> Manage Users</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Website</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <h1 id="panelTitle">Dashboard</h1>
+        <div class="admin-header-right">
+          <div class="admin-user"><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></div>
+          <button class="btn-logout" id="adminLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <!-- ====== DASHBOARD PANEL ====== -->
+        <div class="panel active" id="panelDashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue"><i class="fas fa-file-alt"></i></div>
+              <div class="stat-info"><h3 id="statNotes">0</h3><p>Total Notes</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green"><i class="fas fa-video"></i></div>
+              <div class="stat-info"><h3 id="statVideos">0</h3><p>Total Videos</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange"><i class="fas fa-question-circle"></i></div>
+              <div class="stat-info"><h3 id="statQuestions">0</h3><p>Student Questions</p></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red"><i class="fas fa-users"></i></div>
+              <div class="stat-info"><h3 id="statUsers">0</h3><p>Registered Users</p></div>
+            </div>
+          </div>
+          <div class="admin-card">
+            <h2><i class="fas fa-info-circle"></i> Quick Info</h2>
+            <p style="color:var(--gray-600);font-size:0.9rem;">
+              Welcome to the Topper Notes Hub admin panel. Use the sidebar to manage notes, videos, and view student questions.
+              All data is stored in the browser's localStorage and syncs with the main website automatically.
+            </p>
+            <p style="color:var(--gray-400);font-size:0.82rem;margin-top:10px;">
+              <strong>Admin email:</strong> <code>admin@toppernoteshub.com</code>
+              &nbsp;|&nbsp; <strong>Default password:</strong> <code>admin123</code>
+            </p>
+          </div>
+        </div>
+
+        <!-- ====== NOTES PANEL ====== -->
+        <div class="panel" id="panelNotes">
+          <!-- Upload / Edit Form -->
+          <div class="admin-card" id="noteFormCard">
+            <h2 id="noteFormTitle"><i class="fas fa-plus-circle"></i> Add New Note</h2>
+            <form id="noteForm" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="noteTitle">Title *</label>
+                  <input type="text" id="noteTitle" placeholder="e.g. Class 10 Maths Premium Notes" />
+                  <span class="error-msg" id="noteTitleError"></span>
+                </div>
+                <div class="form-group">
+                  <label for="noteSubject">Subject / Tags *</label>
+                  <input type="text" id="noteSubject" placeholder="e.g. maths class 10" />
+                  <span class="error-msg" id="noteSubjectError"></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="noteDesc">Description *</label>
+                <textarea id="noteDesc" rows="3" placeholder="Short description of the notes..."></textarea>
+                <span class="error-msg" id="noteDescError"></span>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="notePrice">Price (₹) *</label>
+                  <input type="number" id="notePrice" placeholder="e.g. 199" min="0" />
+                  <span class="error-msg" id="notePriceError"></span>
+                </div>
+                <div class="form-group">
+                  <label for="noteIcon">Icon (FontAwesome class)</label>
+                  <select id="noteIcon">
+                    <option value="fa-book">📖 Book (default)</option>
+                    <option value="fa-calculator">🔢 Calculator</option>
+                    <option value="fa-flask">🧪 Flask (Science)</option>
+                    <option value="fa-star">⭐ Star</option>
+                    <option value="fa-file-alt">📄 File</option>
+                    <option value="fa-atom">⚛ Atom (Physics)</option>
+                    <option value="fa-globe">🌍 Globe</option>
+                    <option value="fa-laptop-code">💻 Computer</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="noteBadge">Badge (optional)</label>
+                  <select id="noteBadge">
+                    <option value="">None</option>
+                    <option value="Best Seller">Best Seller</option>
+                    <option value="New">New</option>
+                    <option value="Popular">Popular</option>
+                    <option value="Free">Free</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>PDF File (max 300 MB)</label>
+                  <label class="file-label" for="notePdf">
+                    <i class="fas fa-cloud-upload-alt"></i> <span id="notePdfLabel">Choose PDF file...</span>
+                  </label>
+                  <input type="file" id="notePdf" accept=".pdf" />
+                  <div class="file-name" id="notePdfName"></div>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="noteSubmitBtn"><i class="fas fa-plus"></i> Add Note</button>
+                <button type="button" class="btn btn-cancel hidden" id="noteCancelBtn"><i class="fas fa-times"></i> Cancel</button>
+              </div>
+              <p class="form-msg" id="noteFormMsg"></p>
+            </form>
+          </div>
+
+          <!-- Notes Table -->
+          <div class="admin-card">
+            <h2><i class="fas fa-list"></i> All Notes</h2>
+            <div class="table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Title</th><th>Subject</th><th>Price</th><th>PDF</th><th>Date</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="notesTableBody"></tbody>
+              </table>
+            </div>
+            <div class="empty-state hidden" id="notesEmpty">
+              <i class="fas fa-folder-open"></i>
+              <p>No notes yet. Use the form above to add your first note.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== VIDEOS PANEL ====== -->
+        <div class="panel" id="panelVideos">
+          <div class="admin-card" id="videoFormCard">
+            <h2 id="videoFormTitle"><i class="fas fa-plus-circle"></i> Add New Video</h2>
+            <form id="videoForm" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="videoTitle">Title *</label>
+                  <input type="text" id="videoTitle" placeholder="e.g. Trigonometry — Complete Basics" />
+                  <span class="error-msg" id="videoTitleError"></span>
+                </div>
+                <div class="form-group">
+                  <label for="videoCategory">Category *</label>
+                  <select id="videoCategory">
+                    <option value="">Select category...</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="English">English</option>
+                    <option value="Social Science">Social Science</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="General">General</option>
+                  </select>
+                  <span class="error-msg" id="videoCategoryError"></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="videoUrl">YouTube Video URL *</label>
+                <input type="url" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..." />
+                <span class="error-msg" id="videoUrlError"></span>
+              </div>
+              <div class="form-group">
+                <label for="videoDesc">Description *</label>
+                <textarea id="videoDesc" rows="3" placeholder="Short description of the video..."></textarea>
+                <span class="error-msg" id="videoDescError"></span>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-success" id="videoSubmitBtn"><i class="fas fa-plus"></i> Add Video</button>
+                <button type="button" class="btn btn-cancel hidden" id="videoCancelBtn"><i class="fas fa-times"></i> Cancel</button>
+              </div>
+              <p class="form-msg" id="videoFormMsg"></p>
+            </form>
+          </div>
+
+          <div class="admin-card">
+            <h2><i class="fas fa-list"></i> All Videos</h2>
+            <div class="table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Title</th><th>Category</th><th>YouTube</th><th>Date</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="videosTableBody"></tbody>
+              </table>
+            </div>
+            <div class="empty-state hidden" id="videosEmpty">
+              <i class="fas fa-film"></i>
+              <p>No videos yet. Use the form above to add your first video.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== QUESTIONS PANEL ====== -->
+        <div class="panel" id="panelQuestions">
+          <div class="admin-card">
+            <h2><i class="fas fa-envelope-open-text"></i> Student Questions</h2>
+            <div class="table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Name</th><th>Email</th><th>Question</th><th>Date</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="questionsTableBody"></tbody>
+              </table>
+            </div>
+            <div class="empty-state hidden" id="questionsEmpty">
+              <i class="fas fa-inbox"></i>
+              <p>No student questions yet.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== USERS PANEL ====== -->
+        <div class="panel" id="panelUsers">
+          <div class="admin-card">
+            <h2><i class="fas fa-users-cog"></i> Registered Users</h2>
+            <div class="table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Name</th><th>Email</th><th>Role</th><th>Registered</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+              </table>
+            </div>
+            <div class="empty-state hidden" id="usersEmpty">
+              <i class="fas fa-user-slash"></i>
+              <p>No registered users yet.</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /admin-content -->
+    </main>
+  </div><!-- /admin-layout -->
+
+  <script>
+    /* ============================================
+       ADMIN PANEL — JavaScript
+       ============================================ */
+
+    // ========== CONFIG ==========
+    var ADMIN_EMAIL = "admin@toppernoteshub.com";
+
+    // ========== DOM REFS ==========
+    var screenNotLoggedIn = document.getElementById("screenNotLoggedIn");
+    var screenDenied      = document.getElementById("screenDenied");
+    var adminDashboard    = document.getElementById("adminDashboard");
+    var sidebarToggle     = document.getElementById("sidebarToggle");
+    var sidebar           = document.getElementById("sidebar");
+
+    // ========== ACCESS CONTROL ==========
+    /** Ensure admin account exists in tnh_users so login works */
+    function seedAdminUser() {
+      var users = JSON.parse(localStorage.getItem("tnh_users") || "[]");
+      var exists = false;
+      for (var i = 0; i < users.length; i++) {
+        if (users[i].email === ADMIN_EMAIL) { exists = true; break; }
+      }
+      if (!exists) {
+        users.push({ name: "Admin", email: ADMIN_EMAIL, password: "admin123" });
+        localStorage.setItem("tnh_users", JSON.stringify(users));
+      }
+    }
+    seedAdminUser();
+
+    function showDashboard(session) {
+      adminDashboard.classList.remove("hidden");
+      sidebarToggle.classList.remove("hidden");
+      document.getElementById("adminName").textContent = session.name;
+    }
+
+    function checkAccess() {
+      var session = JSON.parse(localStorage.getItem("tnh_session"));
+      if (!session) {
+        screenNotLoggedIn.classList.remove("hidden");
+        return false;
+      }
+      if (session.email !== ADMIN_EMAIL) {
+        screenDenied.classList.remove("hidden");
+        return false;
+      }
+      // Access granted
+      showDashboard(session);
+      return true;
+    }
+
+    // ========== INLINE LOGIN FORM (on access screen) ==========
+    var adminLoginForm     = document.getElementById("adminLoginForm");
+    var adminLoginEmail    = document.getElementById("adminLoginEmail");
+    var adminLoginPassword = document.getElementById("adminLoginPassword");
+    var adminLoginMsg      = document.getElementById("adminLoginMsg");
+    var adminPwToggle      = document.getElementById("adminPwToggle");
+
+    // Password show/hide
+    adminPwToggle.addEventListener("click", function() {
+      var icon = this.querySelector("i");
+      if (adminLoginPassword.type === "password") {
+        adminLoginPassword.type = "text";
+        icon.classList.replace("fa-eye", "fa-eye-slash");
+      } else {
+        adminLoginPassword.type = "password";
+        icon.classList.replace("fa-eye-slash", "fa-eye");
+      }
+    });
+
+    // Login form submit
+    adminLoginForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var emailErr = document.getElementById("adminLoginEmailError");
+      var passErr  = document.getElementById("adminLoginPasswordError");
+      adminLoginMsg.textContent = "";
+
+      // Validate
+      var email = adminLoginEmail.value.trim();
+      var pass  = adminLoginPassword.value;
+      var valid = true;
+
+      if (!email) { emailErr.textContent = "Please enter your email."; adminLoginEmail.classList.add("invalid"); valid = false; }
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { emailErr.textContent = "Please enter a valid email."; adminLoginEmail.classList.add("invalid"); valid = false; }
+      else { emailErr.textContent = ""; adminLoginEmail.classList.remove("invalid"); }
+
+      if (!pass) { passErr.textContent = "Please enter your password."; adminLoginPassword.classList.add("invalid"); valid = false; }
+      else if (pass.length < 6) { passErr.textContent = "Password must be at least 6 characters."; adminLoginPassword.classList.add("invalid"); valid = false; }
+      else { passErr.textContent = ""; adminLoginPassword.classList.remove("invalid"); }
+
+      if (!valid) return;
+
+      // Authenticate
+      var users = JSON.parse(localStorage.getItem("tnh_users") || "[]");
+      var user = null;
+      for (var i = 0; i < users.length; i++) {
+        if (users[i].email === email && users[i].password === pass) { user = users[i]; break; }
+      }
+
+      if (!user) {
+        adminLoginMsg.textContent = "Invalid email or password.";
+        adminLoginMsg.className = "login-msg error";
+        return;
+      }
+
+      // Save session
+      localStorage.setItem("tnh_session", JSON.stringify({ name: user.name, email: user.email }));
+
+      if (user.email === ADMIN_EMAIL) {
+        adminLoginMsg.innerHTML = '<i class="fas fa-check-circle"></i> Welcome, Admin! Loading dashboard...';
+        adminLoginMsg.className = "login-msg success";
+        setTimeout(function() {
+          screenNotLoggedIn.classList.add("hidden");
+          showDashboard({ name: user.name, email: user.email });
+          initDashboard();
+        }, 800);
+      } else {
+        // Not admin — show denied
+        adminLoginMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Access denied. Admin account required.';
+        adminLoginMsg.className = "login-msg error";
+        setTimeout(function() {
+          screenNotLoggedIn.classList.add("hidden");
+          screenDenied.classList.remove("hidden");
+        }, 1200);
+      }
+    });
+
+    // Clear errors on input
+    adminLoginEmail.addEventListener("input", function() {
+      document.getElementById("adminLoginEmailError").textContent = "";
+      this.classList.remove("invalid");
+    });
+    adminLoginPassword.addEventListener("input", function() {
+      document.getElementById("adminLoginPasswordError").textContent = "";
+      this.classList.remove("invalid");
+    });
+
+    // ========== INIT CHECK ==========
+    if (!checkAccess()) {
+      // Show login form screen, dashboard code deferred via initDashboard()
+    } else {
+      initDashboard();
+    }
+
+    function initDashboard() {
+
+    // ========== SIDEBAR NAVIGATION ==========
+    var sidebarLinks = document.querySelectorAll(".sidebar-nav a");
+    var panels       = document.querySelectorAll(".panel");
+    var panelTitle   = document.getElementById("panelTitle");
+
+    sidebarLinks.forEach(function(link) {
+      link.addEventListener("click", function(e) {
+        e.preventDefault();
+        var targetPanel = this.getAttribute("data-panel");
+
+        sidebarLinks.forEach(function(l) { l.classList.remove("active"); });
+        this.classList.add("active");
+
+        panels.forEach(function(p) { p.classList.remove("active"); });
+        document.getElementById(targetPanel).classList.add("active");
+
+        panelTitle.textContent = this.textContent.trim();
+
+        // Close sidebar on mobile
+        sidebar.classList.remove("open");
+      });
+    });
+
+    // Mobile sidebar toggle
+    sidebarToggle.addEventListener("click", function() {
+      sidebar.classList.toggle("open");
+    });
+
+    // ========== DASHBOARD STATS ==========
+    function updateStats() {
+      var notes     = JSON.parse(localStorage.getItem("tnh_notes") || "[]");
+      var videos    = JSON.parse(localStorage.getItem("tnh_videos") || "[]");
+      var questions = JSON.parse(localStorage.getItem("tnh_questions") || "[]");
+      var users     = JSON.parse(localStorage.getItem("tnh_users") || "[]");
+
+      document.getElementById("statNotes").textContent     = notes.length;
+      document.getElementById("statVideos").textContent    = videos.length;
+      document.getElementById("statQuestions").textContent = questions.length;
+      document.getElementById("statUsers").textContent     = users.length;
+    }
+
+    // ========== HELPER: Simple field validation ==========
+    function valField(input, errorEl, rules) {
+      var val = (typeof input.value === "string") ? input.value.trim() : "";
+      var msg = "";
+      if (rules.required && val === "") msg = rules.msg || "This field is required.";
+      if (!msg && rules.min && Number(val) < 0) msg = "Must be 0 or more.";
+      if (msg) { errorEl.textContent = msg; input.classList.add("invalid"); return false; }
+      errorEl.textContent = ""; input.classList.remove("invalid"); return true;
+    }
+
+    // ========== YOUTUBE URL → EMBED ==========
+    function toEmbedUrl(url) {
+      if (!url) return "";
+      // Already embed
+      var embedMatch = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+      if (embedMatch) return "https://www.youtube.com/embed/" + embedMatch[1];
+      // Standard watch URL
+      var watchMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+      if (watchMatch) return "https://www.youtube.com/embed/" + watchMatch[1];
+      // Short URL
+      var shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+      if (shortMatch) return "https://www.youtube.com/embed/" + shortMatch[1];
+      return url; // fallback
+    }
+
+    // ========== FORMAT DATE ==========
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      var d = new Date(iso);
+      return d.toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
+    }
+
+    // ====================================================
+    //  NOTES CRUD
+    // ====================================================
+    var editingNoteId = null;
+    var notePdfData   = ""; // base64 data for current upload
+
+    var noteForm      = document.getElementById("noteForm");
+    var noteFormTitle  = document.getElementById("noteFormTitle");
+    var noteSubmitBtn  = document.getElementById("noteSubmitBtn");
+    var noteCancelBtn  = document.getElementById("noteCancelBtn");
+    var noteFormMsg    = document.getElementById("noteFormMsg");
+    var notePdfInput   = document.getElementById("notePdf");
+
+    // PDF file handler
+    notePdfInput.addEventListener("change", function() {
+      var file = this.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File too large. Maximum size is 2 MB.");
+        this.value = "";
+        return;
+      }
+      document.getElementById("notePdfLabel").textContent = file.name;
+      document.getElementById("notePdfName").textContent  = "Size: " + (file.size / 1024).toFixed(1) + " KB";
+
+      var reader = new FileReader();
+      reader.onload = function(e) { notePdfData = e.target.result; };
+      reader.readAsDataURL(file);
+    });
+
+    function renderNotesTable() {
+      var notes = JSON.parse(localStorage.getItem("tnh_notes") || "[]");
+      var tbody = document.getElementById("notesTableBody");
+      var empty = document.getElementById("notesEmpty");
+      tbody.innerHTML = "";
+
+      if (notes.length === 0) { empty.classList.remove("hidden"); return; }
+      empty.classList.add("hidden");
+
+      notes.forEach(function(note) {
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td><strong>" + note.title + "</strong></td>" +
+          "<td>" + note.subject + "</td>" +
+          "<td>₹" + note.price + "</td>" +
+          "<td>" + (note.pdfName ? '<i class="fas fa-check-circle" style="color:var(--success)"></i> ' + note.pdfName : '<span style="color:var(--gray-400)">—</span>') + "</td>" +
+          "<td>" + fmtDate(note.createdAt) + "</td>" +
+          '<td class="table-actions">' +
+            '<button class="btn btn-edit btn-sm" onclick="editNote(\'' + note.id + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn btn-delete btn-sm" onclick="deleteNote(\'' + note.id + '\')"><i class="fas fa-trash"></i></button>' +
+          "</td>";
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Submit (Add or Update)
+    noteForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      noteFormMsg.textContent = "";
+
+      var titleOk = valField(document.getElementById("noteTitle"), document.getElementById("noteTitleError"), { required:true, msg:"Title is required." });
+      var subjOk  = valField(document.getElementById("noteSubject"), document.getElementById("noteSubjectError"), { required:true, msg:"Subject is required." });
+      var descOk  = valField(document.getElementById("noteDesc"), document.getElementById("noteDescError"), { required:true, msg:"Description is required." });
+      var priceOk = valField(document.getElementById("notePrice"), document.getElementById("notePriceError"), { required:true, msg:"Price is required." });
+      if (!titleOk || !subjOk || !descOk || !priceOk) return;
+
+      var notes = JSON.parse(localStorage.getItem("tnh_notes") || "[]");
+
+      var noteData = {
+        id:          editingNoteId || ("note_" + Date.now()),
+        title:       document.getElementById("noteTitle").value.trim(),
+        subject:     document.getElementById("noteSubject").value.trim().toLowerCase(),
+        description: document.getElementById("noteDesc").value.trim(),
+        price:       parseInt(document.getElementById("notePrice").value) || 0,
+        icon:        document.getElementById("noteIcon").value,
+        badge:       document.getElementById("noteBadge").value,
+        badgeType:   document.getElementById("noteBadge").value === "New" ? "new" : "",
+        pdfName:     notePdfInput.files[0] ? notePdfInput.files[0].name : "",
+        pdfData:     notePdfData || "",
+        createdAt:   new Date().toISOString()
+      };
+
+      if (editingNoteId) {
+        // Update existing
+        for (var i = 0; i < notes.length; i++) {
+          if (notes[i].id === editingNoteId) {
+            // Preserve old PDF if no new one uploaded
+            if (!noteData.pdfName && notes[i].pdfName) {
+              noteData.pdfName = notes[i].pdfName;
+              noteData.pdfData = notes[i].pdfData;
+            }
+            noteData.createdAt = notes[i].createdAt;
+            notes[i] = noteData;
+            break;
+          }
+        }
+        noteFormMsg.textContent = "Note updated successfully!";
+      } else {
+        notes.push(noteData);
+        noteFormMsg.textContent = "Note added successfully!";
+      }
+      noteFormMsg.className = "form-msg success";
+
+      try {
+        localStorage.setItem("tnh_notes", JSON.stringify(notes));
+      } catch(err) {
+        noteFormMsg.textContent = "Storage full! Try removing the PDF or some old notes.";
+        noteFormMsg.className = "form-msg error";
+        return;
+      }
+
+      resetNoteForm();
+      renderNotesTable();
+      updateStats();
+    });
+
+    function resetNoteForm() {
+      editingNoteId = null;
+      notePdfData = "";
+      noteForm.reset();
+      noteFormTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add New Note';
+      noteSubmitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Note';
+      noteCancelBtn.classList.add("hidden");
+      document.getElementById("notePdfLabel").textContent = "Choose PDF file...";
+      document.getElementById("notePdfName").textContent  = "";
+    }
+
+    // Edit note — fills form
+    window.editNote = function(id) {
+      var notes = JSON.parse(localStorage.getItem("tnh_notes") || "[]");
+      var note = null;
+      for (var i = 0; i < notes.length; i++) { if (notes[i].id === id) { note = notes[i]; break; } }
+      if (!note) return;
+
+      editingNoteId = id;
+      document.getElementById("noteTitle").value   = note.title;
+      document.getElementById("noteSubject").value  = note.subject;
+      document.getElementById("noteDesc").value     = note.description;
+      document.getElementById("notePrice").value    = note.price;
+      document.getElementById("noteIcon").value     = note.icon || "fa-book";
+      document.getElementById("noteBadge").value    = note.badge || "";
+      if (note.pdfName) {
+        document.getElementById("notePdfLabel").textContent = note.pdfName + " (current)";
+      }
+      notePdfData = note.pdfData || "";
+
+      noteFormTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Note';
+      noteSubmitBtn.innerHTML = '<i class="fas fa-save"></i> Update Note';
+      noteCancelBtn.classList.remove("hidden");
+      noteFormMsg.textContent = "";
+
+      document.getElementById("noteFormCard").scrollIntoView({ behavior:"smooth" });
+    };
+
+    // Delete note
+    window.deleteNote = function(id) {
+      if (!confirm("Are you sure you want to delete this note?")) return;
+      var notes = JSON.parse(localStorage.getItem("tnh_notes") || "[]");
+      notes = notes.filter(function(n) { return n.id !== id; });
+      localStorage.setItem("tnh_notes", JSON.stringify(notes));
+      renderNotesTable();
+      updateStats();
+      if (editingNoteId === id) resetNoteForm();
+    };
+
+    noteCancelBtn.addEventListener("click", resetNoteForm);
+
+    // ====================================================
+    //  VIDEOS CRUD
+    // ====================================================
+    var editingVideoId = null;
+
+    var videoForm      = document.getElementById("videoForm");
+    var videoFormTitle  = document.getElementById("videoFormTitle");
+    var videoSubmitBtn  = document.getElementById("videoSubmitBtn");
+    var videoCancelBtn  = document.getElementById("videoCancelBtn");
+    var videoFormMsg    = document.getElementById("videoFormMsg");
+
+    function renderVideosTable() {
+      var videos = JSON.parse(localStorage.getItem("tnh_videos") || "[]");
+      var tbody  = document.getElementById("videosTableBody");
+      var empty  = document.getElementById("videosEmpty");
+      tbody.innerHTML = "";
+
+      if (videos.length === 0) { empty.classList.remove("hidden"); return; }
+      empty.classList.add("hidden");
+
+      videos.forEach(function(v) {
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td><strong>" + v.title + "</strong></td>" +
+          "<td>" + v.category + "</td>" +
+          '<td><a href="' + v.youtubeUrl.replace("/embed/", "/watch?v=") + '" target="_blank" style="color:var(--primary)">View <i class="fas fa-external-link-alt" style="font-size:0.7rem"></i></a></td>' +
+          "<td>" + fmtDate(v.createdAt) + "</td>" +
+          '<td class="table-actions">' +
+            '<button class="btn btn-edit btn-sm" onclick="editVideo(\'' + v.id + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn btn-delete btn-sm" onclick="deleteVideo(\'' + v.id + '\')"><i class="fas fa-trash"></i></button>' +
+          "</td>";
+        tbody.appendChild(tr);
+      });
+    }
+
+    videoForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      videoFormMsg.textContent = "";
+
+      var titleOk = valField(document.getElementById("videoTitle"), document.getElementById("videoTitleError"), { required:true, msg:"Title is required." });
+      var catOk   = valField(document.getElementById("videoCategory"), document.getElementById("videoCategoryError"), { required:true, msg:"Category is required." });
+      var urlOk   = valField(document.getElementById("videoUrl"), document.getElementById("videoUrlError"), { required:true, msg:"YouTube URL is required." });
+      var descOk  = valField(document.getElementById("videoDesc"), document.getElementById("videoDescError"), { required:true, msg:"Description is required." });
+      if (!titleOk || !catOk || !urlOk || !descOk) return;
+
+      var rawUrl   = document.getElementById("videoUrl").value.trim();
+      var embedUrl = toEmbedUrl(rawUrl);
+
+      if (!embedUrl.includes("youtube.com/embed/")) {
+        document.getElementById("videoUrlError").textContent = "Please enter a valid YouTube URL.";
+        return;
+      }
+
+      var videos = JSON.parse(localStorage.getItem("tnh_videos") || "[]");
+
+      var videoData = {
+        id:          editingVideoId || ("video_" + Date.now()),
+        title:       document.getElementById("videoTitle").value.trim(),
+        youtubeUrl:  embedUrl,
+        description: document.getElementById("videoDesc").value.trim(),
+        category:    document.getElementById("videoCategory").value,
+        createdAt:   new Date().toISOString()
+      };
+
+      if (editingVideoId) {
+        for (var i = 0; i < videos.length; i++) {
+          if (videos[i].id === editingVideoId) {
+            videoData.createdAt = videos[i].createdAt;
+            videos[i] = videoData;
+            break;
+          }
+        }
+        videoFormMsg.textContent = "Video updated successfully!";
+      } else {
+        videos.push(videoData);
+        videoFormMsg.textContent = "Video added successfully!";
+      }
+      videoFormMsg.className = "form-msg success";
+
+      localStorage.setItem("tnh_videos", JSON.stringify(videos));
+      resetVideoForm();
+      renderVideosTable();
+      updateStats();
+    });
+
+    function resetVideoForm() {
+      editingVideoId = null;
+      videoForm.reset();
+      videoFormTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add New Video';
+      videoSubmitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Video';
+      videoCancelBtn.classList.add("hidden");
+    }
+
+    window.editVideo = function(id) {
+      var videos = JSON.parse(localStorage.getItem("tnh_videos") || "[]");
+      var v = null;
+      for (var i = 0; i < videos.length; i++) { if (videos[i].id === id) { v = videos[i]; break; } }
+      if (!v) return;
+
+      editingVideoId = id;
+      document.getElementById("videoTitle").value    = v.title;
+      document.getElementById("videoCategory").value = v.category;
+      document.getElementById("videoUrl").value       = v.youtubeUrl;
+      document.getElementById("videoDesc").value      = v.description;
+
+      videoFormTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Video';
+      videoSubmitBtn.innerHTML = '<i class="fas fa-save"></i> Update Video';
+      videoCancelBtn.classList.remove("hidden");
+      videoFormMsg.textContent = "";
+
+      document.getElementById("videoFormCard").scrollIntoView({ behavior:"smooth" });
+    };
+
+    window.deleteVideo = function(id) {
+      if (!confirm("Are you sure you want to delete this video?")) return;
+      var videos = JSON.parse(localStorage.getItem("tnh_videos") || "[]");
+      videos = videos.filter(function(v) { return v.id !== id; });
+      localStorage.setItem("tnh_videos", JSON.stringify(videos));
+      renderVideosTable();
+      updateStats();
+      if (editingVideoId === id) resetVideoForm();
+    };
+
+    videoCancelBtn.addEventListener("click", resetVideoForm);
+
+    // ====================================================
+    //  QUESTIONS (Read + Delete)
+    // ====================================================
+    function renderQuestionsTable() {
+      var questions = JSON.parse(localStorage.getItem("tnh_questions") || "[]");
+      var tbody = document.getElementById("questionsTableBody");
+      var empty = document.getElementById("questionsEmpty");
+      tbody.innerHTML = "";
+
+      if (questions.length === 0) { empty.classList.remove("hidden"); return; }
+      empty.classList.add("hidden");
+
+      // Show newest first
+      questions.slice().reverse().forEach(function(q) {
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td><strong>" + q.name + "</strong></td>" +
+          "<td>" + q.email + "</td>" +
+          "<td style='max-width:300px'>" + q.text + "</td>" +
+          "<td>" + fmtDate(q.date) + "</td>" +
+          '<td class="table-actions">' +
+            '<button class="btn btn-delete btn-sm" onclick="deleteQuestion(\'' + q.id + '\')"><i class="fas fa-trash"></i></button>' +
+          "</td>";
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.deleteQuestion = function(id) {
+      if (!confirm("Delete this question?")) return;
+      var questions = JSON.parse(localStorage.getItem("tnh_questions") || "[]");
+      questions = questions.filter(function(q) { return q.id !== id; });
+      localStorage.setItem("tnh_questions", JSON.stringify(questions));
+      renderQuestionsTable();
+      updateStats();
+    };
+
+    // ========== LOGOUT ==========
+    document.getElementById("adminLogoutBtn").addEventListener("click", function() {
+      localStorage.removeItem("tnh_session");
+      window.location.href = "index.html";
+    });
+
+    // ========== INIT ==========
+    updateStats();
+    renderNotesTable();
+    renderVideosTable();
+    renderQuestionsTable();
+
+    } // end of initDashboard()
+  </script>
+</body>
+</html>
